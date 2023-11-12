@@ -1,24 +1,31 @@
+import { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import MouzaMap from './components/MouzaMap/MouzaMap';
 
-function App() {
+const App = () =>  {
+
+  const [multipolygonData, setMultipolygonData] = useState([]);
+  const [centroidData, setCentroidData] = useState([]);
+
+  useEffect(() => {
+    // Fetch multipolygon data
+    fetch('assets/json/sheetMap_populateLayerData.json')
+      .then(response => response.json())
+      .then(data => {
+        // console.log("setMultipolygonData",data.features[0]);
+        setMultipolygonData(data.features)
+      });
+
+    // Fetch centroid data
+    fetch('assets/json/sheetMap_populateCentroidData.json')
+      .then(response => response.json())
+      .then(data => setCentroidData(data.features));
+  }, []);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <MouzaMap multipolygonWKTs={multipolygonData} centroidWKTs={centroidData} />
   );
 }
 
