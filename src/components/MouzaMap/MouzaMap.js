@@ -1,103 +1,117 @@
-import React, { useEffect, useRef } from "react";
-import Map from 'ol/Map';
-import View from 'ol/View';
-import TileLayer from 'ol/layer/Tile';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import OSM from 'ol/source/OSM';
-import WKT from 'ol/format/WKT';
-import Feature from 'ol/Feature';
-import Style from 'ol/style/Style';
-import CircleStyle from 'ol/style/Circle';
-import Fill from 'ol/style/Fill';
-import Stroke from 'ol/style/Stroke';
-import Text from 'ol/style/Text';
-import Projection from 'ol/proj/Projection';
-import Strategy from 'ol/loadingstrategy';
+import React, { useEffect, useRef, useState } from "react";
+import Map from "ol/Map";
+import View from "ol/View";
+import TileLayer from "ol/layer/Tile";
+import VectorLayer from "ol/layer/Vector";
+import VectorSource from "ol/source/Vector";
+import OSM from "ol/source/OSM";
+import WKT from "ol/format/WKT";
+import Feature from "ol/Feature";
+import Style from "ol/style/Style";
+import CircleStyle from "ol/style/Circle";
+import Fill from "ol/style/Fill";
+import Stroke from "ol/style/Stroke";
+import Text from "ol/style/Text";
+import Projection from "ol/proj/Projection";
+import Strategy from "ol/loadingstrategy";
 
 /**
- * 
- * @param {Object} props 
+ *
+ * @param {Object} props
  * @param {Array} props.multipolygonWKTs
  * @param {Array} props.centroidWKTs
- * @returns 
+ * @returns
  */
 const MouzaMap = (props) => {
-    const mapRef = useRef();
+  const [height, setHeight] = useState("0px");
 
-    useEffect(() => {
-        const format = new WKT();
+  useEffect(() => {
+    const updateHeight = () => {
+      const newHeight = `${window.innerHeight - 10}px`;
+      setHeight(newHeight);
+    };
+    window.addEventListener("resize", updateHeight);
+    updateHeight();
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
 
-        // Convert WKT strings to features
-        const multipolygonFeatures = props.multipolygonWKTs.map(item => {
-            const feature = format.readFeature(item.polygon, {
-                dataProjection: 'EPSG:4326',
-                featureProjection: 'EPSG:3857',
-              });
-            feature.setProperties({
-                plot: item.plotno,
-                area: item.plotArea
-            });
-            return feature;
-        });
-        const centroidFeatures = props.centroidWKTs.map(item => {
-            const feature = format.readFeature(item.point,{
-                dataProjection: 'EPSG:4326',
-                featureProjection: 'EPSG:3857',
-              });
-            feature.setProperties({
-                plot: item.plotno,
-                rend_plotno: item.rend_plotno
-            });
-            return feature;
-        });
+  const mapRef = useRef();
 
-        // Create vector sources
-        const multipolygonSource = new VectorSource({ features: multipolygonFeatures });
-        const centroidSource = new VectorSource({ features: centroidFeatures });
+  useEffect(() => {
+    const format = new WKT();
 
-        const multipolygonLayer = new VectorLayer({ source: multipolygonSource });
-        const centroidLayer = new VectorLayer({ source: centroidSource });
+    // Convert WKT strings to features
+    const multipolygonFeatures = props.multipolygonWKTs.map((item) => {
+      const feature = format.readFeature(item.polygon, {
+        dataProjection: "EPSG:4326",
+        featureProjection: "EPSG:3857",
+      });
+      feature.setProperties({
+        plot: item.plotno,
+        area: item.plotArea,
+      });
+      return feature;
+    });
+    const centroidFeatures = props.centroidWKTs.map((item) => {
+      const feature = format.readFeature(item.point, {
+        dataProjection: "EPSG:4326",
+        featureProjection: "EPSG:3857",
+      });
+      feature.setProperties({
+        plot: item.plotno,
+        rend_plotno: item.rend_plotno,
+      });
+      return feature;
+    });
 
-        // Create vector layers
-        // const multipolygonLayer = new VectorLayer({ 
-        //     source: multipolygonSource,
-        //     style : function (feature) {
-        //         return new Style({
-        //             image: new CircleStyle({
-        //                 radius: 15,
-        //                 fill: new Fill({colour: '#ffcc66'}),
-        //                 stroke: new Stroke({color: '#cc6633', width: 1})
-        //             }),
-        //             text: new Text({
-        //                 text: feature.get('plot'),
-        //                 font: 'bold ' + getFontSize(feature) + 'px BNB-TTBidisha',
-        //                 fill: new Fill({ color: 'blue' })
-        //             })
-        //         })
-        //     }
-        // });
-        // const centroidLayer = new VectorLayer({ 
-        //     source: centroidSource,
-        //     style: function (feature) {
-        //       return new Style({
-        //         image: new CircleStyle({
-        //           radius: 0,
-        //           fill: new Fill({ color: '#ffcc66' }),
-        //           stroke: new Stroke({ color: '#cc6633', width: 1 })
-        //         }),
-        //         text: new Text({
-        //           text: getLabel(feature),
-        //           offsetX: getLOffsetX(feature),
-        //           offsetY: getLOffsetY(feature),
-        //           font: 'bold ' + getFontSizeCen(feature) + 'px BNB-TTBidisha',
-        //           fill: new Fill({ color: 'blue' })
-        //         })
-        //       });
-        //     } 
-        // });
+    // Create vector sources
+    const multipolygonSource = new VectorSource({
+      features: multipolygonFeatures,
+    });
+    const centroidSource = new VectorSource({ features: centroidFeatures });
 
-        // Function to calculate font size based on zoom level
+    const multipolygonLayer = new VectorLayer({ source: multipolygonSource });
+    const centroidLayer = new VectorLayer({ source: centroidSource });
+
+    // Create vector layers
+    // const multipolygonLayer = new VectorLayer({
+    //     source: multipolygonSource,
+    //     style : function (feature) {
+    //         return new Style({
+    //             image: new CircleStyle({
+    //                 radius: 15,
+    //                 fill: new Fill({colour: '#ffcc66'}),
+    //                 stroke: new Stroke({color: '#cc6633', width: 1})
+    //             }),
+    //             text: new Text({
+    //                 text: feature.get('plot'),
+    //                 font: 'bold ' + getFontSize(feature) + 'px BNB-TTBidisha',
+    //                 fill: new Fill({ color: 'blue' })
+    //             })
+    //         })
+    //     }
+    // });
+    // const centroidLayer = new VectorLayer({
+    //     source: centroidSource,
+    //     style: function (feature) {
+    //       return new Style({
+    //         image: new CircleStyle({
+    //           radius: 0,
+    //           fill: new Fill({ color: '#ffcc66' }),
+    //           stroke: new Stroke({ color: '#cc6633', width: 1 })
+    //         }),
+    //         text: new Text({
+    //           text: getLabel(feature),
+    //           offsetX: getLOffsetX(feature),
+    //           offsetY: getLOffsetY(feature),
+    //           font: 'bold ' + getFontSizeCen(feature) + 'px BNB-TTBidisha',
+    //           fill: new Fill({ color: 'blue' })
+    //         })
+    //       });
+    //     }
+    // });
+
+    // Function to calculate font size based on zoom level
     // function getFontSize(feature) {
     //   let defaultSize = feature.get('map').getView().getZoom();
     //   if (defaultSize - 14 > 14) {
@@ -152,21 +166,25 @@ const MouzaMap = (props) => {
     //   return defaultSize - 5;
     // }
 
-        // Create map
-        const map = new Map({
-            target: mapRef.current,
-            layers: [
-                new TileLayer({ source: new OSM() }),
-                multipolygonLayer,
-                centroidLayer
-            ],
-            view: new View({ center: [0, 0], zoom: 2 })
-        });
+    // Create map
+    const map = new Map({
+      target: mapRef.current,
+      layers: [
+        new TileLayer({ source: new OSM() }),
+        multipolygonLayer,
+        centroidLayer,
+      ],
+      view: new View({
+        center: [0, 0],
+        zoom: 2,
+        projection: "EPSG:4326",
+      }),
+    });
 
-        return () => map.setTarget(undefined); // Clean up on unmount
-    }, [props.multipolygonWKTs, props.centroidWKTs]);
+    return () => map.setTarget(undefined); // Clean up on unmount
+  }, [props.multipolygonWKTs, props.centroidWKTs]);
 
-    return <div ref={mapRef} style={{ width: '100%', height: '400px' }} />;
+  return <div ref={mapRef} style={{ width: "100%", height: height }} />;
 };
 
 export default MouzaMap;
