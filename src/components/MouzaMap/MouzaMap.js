@@ -6,6 +6,7 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import OSM from "ol/source/OSM";
 import WKT from "ol/format/WKT";
+import { fromLonLat } from 'ol/proj';
 import Feature from "ol/Feature";
 import Style from "ol/style/Style";
 import CircleStyle from "ol/style/Circle";
@@ -170,7 +171,7 @@ const MouzaMap = (props) => {
     const map = new Map({
       target: mapRef.current,
       layers: [
-        new TileLayer({ source: new OSM() }),
+        // new TileLayer({ source: new OSM() }),
         multipolygonLayer,
         centroidLayer,
       ],
@@ -184,7 +185,7 @@ const MouzaMap = (props) => {
     return () => map.setTarget(undefined); // Clean up on unmount
   }, [props.multipolygonWKTs, props.centroidWKTs]);
 
-  return <div ref={mapRef} style={{ width: "100%", height: height }} />;
+  return <div ref={mapRef} id="map" style={{ width: "100%", height:height }} />;
 };
 
 export default MouzaMap;
