@@ -74,106 +74,10 @@ const MouzaMap = (props) => {
     const multipolygonLayer = new VectorLayer({ source: multipolygonSource });
     const centroidLayer = new VectorLayer({ source: centroidSource });
 
-    // Create vector layers
-    // const multipolygonLayer = new VectorLayer({
-    //     source: multipolygonSource,
-    //     style : function (feature) {
-    //         return new Style({
-    //             image: new CircleStyle({
-    //                 radius: 15,
-    //                 fill: new Fill({colour: '#ffcc66'}),
-    //                 stroke: new Stroke({color: '#cc6633', width: 1})
-    //             }),
-    //             text: new Text({
-    //                 text: feature.get('plot'),
-    //                 font: 'bold ' + getFontSize(feature) + 'px BNB-TTBidisha',
-    //                 fill: new Fill({ color: 'blue' })
-    //             })
-    //         })
-    //     }
-    // });
-    // const centroidLayer = new VectorLayer({
-    //     source: centroidSource,
-    //     style: function (feature) {
-    //       return new Style({
-    //         image: new CircleStyle({
-    //           radius: 0,
-    //           fill: new Fill({ color: '#ffcc66' }),
-    //           stroke: new Stroke({ color: '#cc6633', width: 1 })
-    //         }),
-    //         text: new Text({
-    //           text: getLabel(feature),
-    //           offsetX: getLOffsetX(feature),
-    //           offsetY: getLOffsetY(feature),
-    //           font: 'bold ' + getFontSizeCen(feature) + 'px BNB-TTBidisha',
-    //           fill: new Fill({ color: 'blue' })
-    //         })
-    //       });
-    //     }
-    // });
-
-    // Function to calculate font size based on zoom level
-    // function getFontSize(feature) {
-    //   let defaultSize = feature.get('map').getView().getZoom();
-    //   if (defaultSize - 14 > 14) {
-    //     let zoomLevel = defaultSize - 14;
-    //     defaultSize = defaultSize + zoomLevel + 14;
-    //   }
-    //   return defaultSize;
-    // }
-
-    // function getLabel(feature) {
-    //   if (feature.get('map').getView().getZoom() >= 15) {
-    //     return feature.get('rend_plot');
-    //   } else {
-    //     return '';
-    //   }
-    // }
-
-    // function getLOffsetX(feature) {
-    //   let zoom = feature.get('map').getView().getZoom();
-    //   if (zoom >= 26) {
-    //     return 20;
-    //   } else if (zoom >= 23) {
-    //     return 16;
-    //   } else if (zoom >= 20) {
-    //     return 14;
-    //   } else if (zoom >= 17) {
-    //     return 10;
-    //   } else {
-    //     return 3;
-    //   }
-    // }
-
-    // function getLOffsetY(feature) {
-    //   let zoom = feature.get('map').getView().getZoom();
-    //   if (zoom >= 23) {
-    //     return 9;
-    //   } else if (zoom >= 20) {
-    //     return 6;
-    //   } else if (zoom >= 17) {
-    //     return 4;
-    //   } else {
-    //     return 1;
-    //   }
-    // }
-
-    // function getFontSizeCen(feature) {
-    //   let defaultSize = feature.get('map').getView().getZoom();
-    //   if (defaultSize > 15) {
-    //     let zoomLevel = (defaultSize - 15) * 6;
-    //     defaultSize = defaultSize + zoomLevel;
-    //   }
-    //   return defaultSize - 5;
-    // }
-
     // Create map
     const map = new Map({
       target: mapRef.current,
-      layers: [
-        // new TileLayer({ source: new OSM() }),
-        multipolygonLayer,
-        centroidLayer,
+      layers: [ multipolygonLayer, centroidLayer, new TileLayer({ source: new OSM() }),
       ],
       view: new View({
         center: [0, 0],
@@ -185,7 +89,7 @@ const MouzaMap = (props) => {
     return () => map.setTarget(undefined); // Clean up on unmount
   }, [props.multipolygonWKTs, props.centroidWKTs]);
 
-  return <div ref={mapRef} id="map" style={{ width: "100%", height:height }} />;
+  return <div ref={mapRef} id="map" style={{ width: "100%", height:"200px" }} />;
 };
 
 export default MouzaMap;
